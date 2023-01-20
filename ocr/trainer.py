@@ -73,7 +73,7 @@ class Rocket:
         LOGGER.info("🧳 saving model...")
         save_dct = {
             "weights": self.engine.model.state_dict(),
-            "optimizer_state": self.engine.optimzer.state_dict(),
+            "optimizer_state": self.engine.optimizer.state_dict(),
             "last_epoch": self.last_epoch
         }
 
@@ -128,7 +128,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-model = CRNN(80, 1, 36, 256)
+model = CRNN(32, 1, 36, 256)
 engine = Engine(model, args)
 rocket = Rocket(engine, args)
 rocket.launch()

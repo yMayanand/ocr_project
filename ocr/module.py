@@ -14,7 +14,7 @@ class Engine:
         transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Grayscale(),
-            transforms.Resize((80, 120)),
+            transforms.Resize((32, 128)),
             transforms.Lambda(lambda x: x/255),
             transforms.Normalize(0.5, 0.5)
         ])

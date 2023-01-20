@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 from torchvision import transforms
 import torch
 from utils import greedy_decode, idx2char, post_process
+import random
+import numpy as np
 
 parser = ArgumentParser()
 
@@ -30,15 +32,22 @@ args = parser.parse_args()
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Grayscale(),
-    transforms.Resize((80, 120)),
+    transforms.Resize((32, 128)),
     transforms.Lambda(lambda x: x/255),
     transforms.Normalize(0.5, 0.5)
 ])
 
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+torch.manual_seed(0)
+np.random.seed(0)
+random.seed(0)
+
 dataset = OCRDataset(args.root_dir, transforms=transform)
 image, *target = dataset[args.idx]
 target = idx2char(target, dataset)
-model = model = CRNN(80, 1, 36, 256)
+model = CRNN(32, 1, 36, 256)
 state_dict = torch.load(args.ckpt_path)
 model.load_state_dict(state_dict['weights'])
 model.eval()
