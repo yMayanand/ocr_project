@@ -34,11 +34,13 @@ class OCRDataset(torch.utils.data.Dataset):
         return img, *labels
 
     def make_vocab(self):
-        self.idx2char = set()
+        self.idx2char = []
         for file in self.image_files:
             tmp = file.split('/')[-1].split('.jpg')[0]
-            self.idx2char.update(list(tmp))
-        self.idx2char = list(self.idx2char)
+            for i in tmp:
+                if i not in self.idx2char:
+                    self.idx2char.append(i)
+        
         self.idx2char.insert(0, 'BLANK')
         
     def get_characteristics(self):
