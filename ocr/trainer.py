@@ -39,6 +39,7 @@ class Rocket:
 
         start = self.start_epoch
         for epoch in range(start, start+self.epochs):
+            self.engine.model.train()
             for batch_idx, batch in enumerate(self.engine.train_dl):
                 batch = batch_to_device(batch, self.device)
                 loss = self.engine.train_step(batch)
@@ -128,7 +129,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-model = CRNN(32, 1, 36, 256)
+model = CRNN(80, 1, 36, 256)
 engine = Engine(model, args)
 rocket = Rocket(engine, args)
 rocket.launch()
