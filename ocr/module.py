@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn.functional as F
 from ocr_dataset import OCRDataset
@@ -45,6 +46,16 @@ class Engine:
         seq_len, batch_size = preds.shape[:2]
         preds_len = torch.LongTensor([seq_len]*batch_size)
         loss = self.loss_fn(preds, target, preds_len, target_len)
+        if math.isnan(loss.item()):
+                    print("logits:", preds)
+                    print("logits_shape:", preds.shape)
+                    print("labels:", target)
+                    print("labels_shape", target.shape)
+                    print("prediction_sizes:", preds_len)
+                    print("target_sizes:", target_len)
+                    print("prediction_sizes_shape:", preds_len.shape)
+                    print("target_sizes_shape:", target_len.shape)
+                    raise Exception("NaN loss obtained. But why?")
         return loss
 
     def val_step(self, batch):
