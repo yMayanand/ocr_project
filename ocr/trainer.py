@@ -1,5 +1,6 @@
 import gc
 import logging
+import math
 import os
 from argparse import ArgumentParser
 
@@ -46,7 +47,16 @@ class Rocket:
                 loss.backward()
                 self.engine.optimizer.step()
                 self.engine.optimizer.zero_grad()
-                self.loss_meter.update(loss.item())
+                l = loss.item()
+                if math.isnan(l):
+                    print("Loss:", l)
+                    #print("logits:", logits)
+                    #print("labels:", labels)
+                    #print("prediction_sizes:", prediction_sizes)
+                    #print("target_sizes:", batch)
+                    raise Exception("NaN loss obtained. But why?")
+                
+                self.loss_meter.update(l)
             msg = colorstr(f"EPOCH{epoch} LOSS:- ") \
                 + colorstr('magenta', 'bold', f"{self.loss_meter.avg:.3f}")
             self.loss_meter.reset()

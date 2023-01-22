@@ -9,7 +9,7 @@ from torchvision import transforms
 class Engine:
     def __init__(self, model, args):
         self.model = model
-        self.loss_fn = torch.nn.CTCLoss()
+        self.loss_fn = torch.nn.CTCLoss(zero_infinity=True)
 
         transform = transforms.Compose([
             transforms.ToTensor(),

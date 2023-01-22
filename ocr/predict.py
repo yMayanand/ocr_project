@@ -3,7 +3,7 @@ from model import CRNN
 from argparse import ArgumentParser
 from torchvision import transforms
 import torch
-from utils import greedy_decode, idx2char, post_process
+from utils import greedy_decode, idx2char, post_process, read_image
 import random
 import numpy as np
 
@@ -27,6 +27,12 @@ parser.add_argument(
     help="index of dataset on which we want to predict"
 )
 
+parser.add_argument(
+    '--img_path',
+    type=str,
+    help="path to image on which prediction is to be made"
+)
+
 args = parser.parse_args()
 
 transform = transforms.Compose([
@@ -45,13 +51,15 @@ np.random.seed(0)
 random.seed(0)
 
 dataset = OCRDataset(args.root_dir, transforms=transform)
-image, *target = dataset[args.idx]
-target = idx2char(target, dataset)
+#image, *target = dataset[args.idx]
+#target = idx2char(target, dataset)
 model = CRNN(80, 1, 36, 256)
-state_dict = torch.load(args.ckpt_path)
+state_dict = torch.load(args.ckpt_path, map_location=torch.device('cpu'))
 model.load_state_dict(state_dict['weights'])
 model.eval()
+image = read_image(args.img_path)
+image = transform(image)
 preds = model(image.unsqueeze(0))
 preds = post_process(preds[:, 0, :], dataset)
-print(f"target {''.join(target)}")
+#print(f"target {''.join(target)}")
 print(f"preds {greedy_decode(preds)}")
