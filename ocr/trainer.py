@@ -48,13 +48,6 @@ class Rocket:
                 self.engine.optimizer.step()
                 self.engine.optimizer.zero_grad()
                 l = loss.item()
-                if math.isnan(l):
-                    print("Loss:", l)
-                    #print("logits:", logits)
-                    #print("labels:", labels)
-                    #print("prediction_sizes:", prediction_sizes)
-                    #print("target_sizes:", batch)
-                    raise Exception("NaN loss obtained. But why?")
                 
                 self.loss_meter.update(l)
             msg = colorstr(f"EPOCH{epoch} LOSS:- ") \
