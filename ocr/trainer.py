@@ -39,6 +39,7 @@ class Rocket:
             self.launch_resume_routine()
 
         start = self.start_epoch
+        best_score =  0
         for epoch in range(start, start+self.epochs):
             self.engine.model.train()
             for batch_idx, batch in enumerate(self.engine.train_dl):
@@ -71,12 +72,16 @@ class Rocket:
                 + colorstr('green', 'bold', f"{avg_metric:.3f}\n")
             LOGGER.info(msg)
 
+            if avg_metric > best_score:
+                best_score = avg_metric
+                self.save('best.pt')
+
         gc.collect()
         torch.cuda.empty_cache()
         
         self.save()
         
-    def save(self):
+    def save(self, filename='ckpt.pt'):
         LOGGER.info("🧳 saving model...")
         save_dct = {
             "weights": self.engine.model.state_dict(),
@@ -84,7 +89,7 @@ class Rocket:
             "last_epoch": self.last_epoch
         }
 
-        torch.save(save_dct, os.path.join(self.ckpt_dir, "ckpt.pt"))
+        torch.save(save_dct, os.path.join(self.ckpt_dir, filename))
 
     def launch_resume_routine(self):
         LOGGER.info("🪄 resuming training...")
