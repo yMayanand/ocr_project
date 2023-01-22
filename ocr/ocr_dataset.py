@@ -3,6 +3,12 @@ import pandas as pd
 import torch
 from utils import read_image
 
+VOCAB_PATCH = [
+    'BLANK', 'Z', 'B', '4', 'X', 'R', '2', 'U', 'D', 'G', 
+    'Q', 'S', 'A', 'N', 'K', '0', 'C', 'J', 'P', 'Y', 'H', 
+    '7', 'W', 'V', '5', 'F', 'L', '8', '1', 'I', 'T', 'M', 
+    '3', 'O', '9', 'E', '6']
+
 
 class OCRDataset(torch.utils.data.Dataset):
     r"""Dataset to train an OCR model
@@ -34,14 +40,15 @@ class OCRDataset(torch.utils.data.Dataset):
         return img, *labels
 
     def make_vocab(self):
-        self.idx2char = []
+        """self.idx2char = []
         for file in self.image_files:
             tmp = file.split('/')[-1].split('.jpg')[0]
             for i in tmp:
                 if i not in self.idx2char:
                     self.idx2char.append(i)
         
-        self.idx2char.insert(0, 'BLANK')
+        self.idx2char.insert(0, 'BLANK')"""
+        self.idx2char = VOCAB_PATCH
         
     def get_characteristics(self):
         df = pd.DataFrame(columns=['height', 'width', 'channels'])

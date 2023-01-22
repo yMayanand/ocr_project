@@ -53,7 +53,7 @@ random.seed(0)
 dataset = OCRDataset(args.root_dir, transforms=transform)
 #image, *target = dataset[args.idx]
 #target = idx2char(target, dataset)
-model = CRNN(80, 1, 37, 256)
+model = CRNN(80, 1, 37, 512)
 state_dict = torch.load(args.ckpt_path, map_location=torch.device('cpu'))
 model.load_state_dict(state_dict['weights'])
 model.eval()

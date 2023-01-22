@@ -1,6 +1,7 @@
 import gc
 import logging
 import math
+import time
 import os
 from argparse import ArgumentParser
 
@@ -37,9 +38,10 @@ class Rocket:
         # look if resume_path specified
         if self.args.resume_path is not None:
             self.launch_resume_routine()
-
+    
         start = self.start_epoch
         best_score =  0
+        print(self.engine.optimizer.param_groups[0]['lr'])
         for epoch in range(start, start+self.epochs):
             self.engine.model.train()
             for batch_idx, batch in enumerate(self.engine.train_dl):
@@ -51,9 +53,8 @@ class Rocket:
 
                 self.engine.optimizer.step()
                 self.engine.optimizer.zero_grad()
-                l = loss.item()
                 
-                self.loss_meter.update(l)
+                self.loss_meter.update(loss.item())
             msg = colorstr(f"EPOCH{epoch} LOSS:- ") \
                 + colorstr('magenta', 'bold', f"{self.loss_meter.avg:.3f}")
             self.loss_meter.reset()
@@ -74,7 +75,13 @@ class Rocket:
 
             if avg_metric > best_score:
                 best_score = avg_metric
-                self.save('best.pt')
+                time_stats = list(time.localtime())[:5]
+                time_stats = map(str, time_stats)
+                filename = (
+                    "best" + "_".join(time_stats) 
+                    + f"_{best_score}.pt")
+
+                self.save(filename)
 
         gc.collect()
         torch.cuda.empty_cache()
@@ -99,6 +106,7 @@ class Rocket:
         self.engine.model.load_state_dict(state_dict['weights'])
         self.engine.optimizer.load_state_dict(state_dict['optimizer_state'])
         self.start_epoch = state_dict['last_epoch']
+        self.engine.optimizer.param_groups[0]['lr'] = self.args.lr
 
 
 parser = ArgumentParser()
@@ -140,7 +148,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-model = CRNN(80, 1, 37, 256)
+model = CRNN(80, 1, 37, 512)
 engine = Engine(model, args)
 rocket = Rocket(engine, args)
 rocket.launch()
