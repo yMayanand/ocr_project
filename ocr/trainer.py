@@ -46,7 +46,7 @@ class Rocket:
                 loss = self.engine.train_step(batch)
                 loss.backward()
                 # clip here
-                torch.nn.utils.clip_grad_norm_(self.engine.model.parameters(), 1.0) # or some other value
+                #torch.nn.utils.clip_grad_norm_(self.engine.model.parameters(), 1.0) # or some other value
 
                 self.engine.optimizer.step()
                 self.engine.optimizer.zero_grad()
