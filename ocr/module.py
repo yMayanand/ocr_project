@@ -5,12 +5,13 @@ from ocr_dataset import OCRDataset
 from utils import *
 from torch.utils import data
 from torchvision import transforms
-
+from torchmetrics import CharErrorRate
 
 class Engine:
     def __init__(self, model, args):
         self.model = model
         self.loss_fn = torch.nn.CTCLoss(zero_infinity=True)
+        self.cer_metric_fn = CharErrorRate()
 
         transform = transforms.Compose([
             transforms.ToTensor(),
@@ -79,13 +80,14 @@ class Engine:
             start = start + end
             target_seqs.append("".join(tmp))
 
-        scores = []
+        #scores = []
         
-        for i, j in zip(pred_seqs, target_seqs):
-            score = char_accuracy(i, j)
-            scores.append(score)
+        #for i, j in zip(pred_seqs, target_seqs):
+        #    score = char_accuracy(i, j)
+        #    scores.append(score)
 
-        final_res = sum(scores) / len(scores)
+        #final_res = sum(scores) / len(scores)
+        final_res = self.cer_metric_fn(pred_seqs, target_seqs)
         return final_res
         
     

@@ -69,7 +69,7 @@ class Rocket:
                 val_metric.append(metric)
             avg_metric = sum(val_metric) / len(val_metric)
 
-            msg = colorstr(f"EPOCH{epoch} CHAR_ACC:- ") \
+            msg = colorstr(f"EPOCH{epoch} CER:- ") \
                 + colorstr('green', 'bold', f"{avg_metric:.3f}\n")
             LOGGER.info(msg)
 
