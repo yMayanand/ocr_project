@@ -38,6 +38,15 @@ class Rocket:
         # look if resume_path specified
         if self.args.resume_path is not None:
             self.launch_resume_routine()
+
+        # Validation
+        val_metric = []
+        for batch_idx, batch in enumerate(self.engine.val_dl):
+            batch = batch_to_device(batch, self.device)
+            metric = self.engine.val_step(batch)
+            val_metric.append(metric)
+        avg_metric = sum(val_metric) / len(val_metric)
+        print(f"at start: {avg_metric}")
     
         start = self.start_epoch
         best_score =  0
@@ -148,7 +157,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-model = CRNN(80, 1, 37, 512)
+model = CRNN(32, 1, 37, 256)
 engine = Engine(model, args)
 rocket = Rocket(engine, args)
 rocket.launch()
