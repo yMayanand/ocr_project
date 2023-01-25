@@ -45,6 +45,15 @@ transform = transforms.Compose([
     transforms.Normalize(0.5, 0.5)
 ])
 
+# custom weights initialization called on crnn
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        m.weight.data.normal_(0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        m.weight.data.normal_(1.0, 0.02)
+        m.bias.data.fill_(0)
+
 
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
@@ -56,6 +65,7 @@ dataset = OCRDataset(args.root_dir, transforms=transform)
 #image, *target = dataset[args.idx]
 #target = idx2char(target, dataset)
 model = CRNN(80, 1, 37, 256)
+model.apply(weights_init)
 if args.ckpt_path is not None:
     state_dict = torch.load(args.ckpt_path, map_location=torch.device('cpu'))
     model.load_state_dict(state_dict['weights'])

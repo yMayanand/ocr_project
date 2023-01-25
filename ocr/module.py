@@ -16,8 +16,8 @@ class Engine:
         transform = transforms.Compose([
             transforms.ToTensor(),
             transforms.Grayscale(),
-            transforms.Resize((80, 128)),
-            transforms.Lambda(lambda x: x/255),
+            transforms.Resize((32, 128)),
+            #transforms.Lambda(lambda x: x/255),
             transforms.Normalize(0.5, 0.5)
         ])
 
@@ -28,13 +28,20 @@ class Engine:
         )
 
         train_ds, val_ds = get_dataset_split(self.dataset, (0.8, 0.2))
+        print('train_ds', len(train_ds))
+        print('val_ds', len(val_ds))
 
         self.train_dl = data.DataLoader(
-            train_ds, batch_size=32, 
-            shuffle=True, collate_fn=custom_collate
+            train_ds, batch_size=64, 
+            shuffle=True, collate_fn=custom_collate,
+            num_workers=2
         )
 
-        self.val_dl = data.DataLoader(val_ds, batch_size=32, collate_fn=custom_collate)
+        self.val_dl = data.DataLoader(
+            val_ds, batch_size=64, 
+            collate_fn=custom_collate,
+            num_workers=2
+        )
         self.optimizer = torch.optim.Adam(
             self.model.parameters(),
             lr=args.lr,

@@ -75,12 +75,18 @@ class Rocket:
             for batch_idx, batch in enumerate(self.engine.val_dl):
                 batch = batch_to_device(batch, self.device)
                 metric = self.engine.val_step(batch)
+                loss = self.engine.train_step(batch)
+                self.loss_meter.update(loss.item())
                 val_metric.append(metric)
             avg_metric = sum(val_metric) / len(val_metric)
 
             msg = colorstr(f"EPOCH{epoch} CER:- ") \
-                + colorstr('green', 'bold', f"{avg_metric:.3f}\n")
+                + colorstr('green', 'bold', f"{avg_metric:.3f}")
             LOGGER.info(msg)
+            msg = colorstr(f"EPOCH{epoch} VAL_LOSS:- ") \
+                + colorstr('green', 'bold', f"{self.loss_meter.avg:.3f}\n")
+            LOGGER.info(msg)
+            self.loss_meter.reset()
 
             if avg_metric > best_score:
                 best_score = avg_metric
@@ -157,7 +163,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-model = CRNN(32, 1, 37, 256)
+model = CRNN(32, 1, 37, 512)
 engine = Engine(model, args)
 rocket = Rocket(engine, args)
 rocket.launch()
